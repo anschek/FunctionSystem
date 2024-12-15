@@ -11,6 +11,9 @@ namespace FunctionSystem
 {
     internal static class Trigonometry
     {
+        private static bool isCorrectWithMeasurementError(double expected, double value, double epsilon=1e-10) => expected - epsilon <= value && value <= expected + epsilon;
+
+
         // sin a
         internal static double _base(double alpha) => Math.Sin(alpha);
 
@@ -20,7 +23,8 @@ namespace FunctionSystem
             sin ??= _base;
             if (Math.Abs(sin(alpha)) < 1e-10)
             {
-                if (alpha == Math.PI || alpha == 3 * Math.PI)  return -1; //180
+                //if (alpha == Math.PI || alpha == 3 * Math.PI) return -1; //180
+                if (isCorrectWithMeasurementError(Math.PI,Math.Abs(alpha)) || isCorrectWithMeasurementError(Math.PI * 3, Math.Abs(alpha))) return -1; //180
                 return 1; // 0360
             }
             return Math.Sqrt(1 - Math.Pow(sin(alpha), 2) );
@@ -29,24 +33,41 @@ namespace FunctionSystem
         internal static double Sec(double alpha, Func<double, double>? cos = null)
         {
             cos ??= (angle) => Cos(angle, _base);
-            return 1/ cos(alpha);
+            double cosValue = cos(alpha);
+            if (Math.Abs(cosValue) < 1e-10) return double.PositiveInfinity * Math.Sign(cosValue);
+            
+            return 1 / cosValue;
         }
         // tg a = sin a/ cos a
         internal static double Tan(double alpha, Func<double, double>? sin = null, Func<double, double>? cos = null)
         {
             sin ??= _base;
             cos ??= (angle) => Cos(angle, sin);
-            return sin(alpha)/cos(alpha);
+
+            double cosValue = cos(alpha);
+            if (Math.Abs(cosValue) < 1e-10) return double.NaN;
+            
+            double sinValue = sin(alpha);
+            if (Math.Abs(sinValue) < 1e-10) return 0.0;
+
+            return sinValue / cosValue;
         }
         // ctg a = 1/ tg a
         internal static double Cot(double alpha, Func<double, double>? tan = null)
         {
-            if(tan == null)
+            tan ??= (angle) =>
             {
-                Func<double, double> cos = (angle) => Cos(angle, _base);
-                tan = (angle) => Tan(angle, cos);
-            }
-            return 1 / tan(alpha);
+                Func<double, double> cos = (a) => Cos(a, _base);
+                return Tan(angle, _base, cos);
+            };
+
+            double tanValue = tan(alpha);
+            if (Math.Abs(alpha % Math.PI) == Math.PI / 2 || double.IsNaN(tanValue)) // ±90°, ±270° etc.
+                return double.NaN;
+            
+            if (Math.Abs(tanValue) < 1e-10) return double.PositiveInfinity;
+            
+            return 1 / tanValue;
         }
         // first function from task
         public static double SystemFunc(
