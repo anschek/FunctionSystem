@@ -135,5 +135,57 @@ namespace FunctionSystem_Test
             Assert.AreEqual(double.NaN, expected);
             Assert.AreEqual(double.NaN, real);
         }
+
+        [TestMethod]
+        public void L0_Logarithmic_base()
+        {
+            double x = Math.E;
+            int expected = 1;
+
+            double real = Logarithmic._base(x);
+
+            Console.WriteLine(real);
+            Assert.AreEqual(expected, real, epsilon);
+        }
+            [TestMethod]
+        public void L1_Logarithmic_Log()
+        {
+            (double @base, double arg)[] x = { (10,1000), (2,32), (10,1)};
+            double[] expected = { 3, 5, 0 };
+            Func<double,double> driver = Math.Log;
+
+            for (int i = 0; i < x.Length; ++i)
+            {
+                double real = Logarithmic.Log(x[i].@base, x[i].arg, driver);
+
+                Console.WriteLine($"log {x[i].@base} ({x[i].arg}) = {real}");
+                Assert.AreEqual(expected[i], real, epsilon);
+            }
+        }        
+        [TestMethod]
+        public void L2_Logarithmic_SystemFunc()
+        {
+            double x = 100;
+            Func<double, double> driver = Math.Log;
+
+            double expected = Logarithmic.SystemFunc(x, driver);
+            double real = Logarithmic.SystemFunc(x);
+            Console.WriteLine($"expected:{expected}\nreal:{real}");
+            Assert.AreEqual(expected, real, epsilon);
+        }        
+        [TestMethod]
+        public void LMAX_Complex_FunctionSystem()
+        {
+            double[] x = { DegreesToRadians(-45), 100 };
+            Complex.TrigonometricFunc trigDriver = Trigonometry.SystemFunc;
+            Complex.LogarithmicFunc logDriver = Logarithmic.SystemFunc;
+
+            for (int i = 0; i < x.Length; ++i) {
+                double expected = Complex.FunctionSystem(x[i], trigDriver, logDriver);
+                double real = Complex.FunctionSystem(x[i]);
+                Console.WriteLine($"real:{real}");
+            }
+            
+        }
     }
 }
