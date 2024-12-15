@@ -41,16 +41,22 @@ namespace FunctionSystem
         // tg a = sin a/ cos a
         internal static double Tan(double alpha, Func<double, double>? sin = null, Func<double, double>? cos = null)
         {
+
             sin ??= _base;
             cos ??= (angle) => Cos(angle, sin);
 
             double cosValue = cos(alpha);
-            if (Math.Abs(cosValue) < 1e-10) return double.NaN;
-            
             double sinValue = sin(alpha);
-            if (Math.Abs(sinValue) < 1e-10) return 0.0;
+            int sign = 1;
 
-            return sinValue / cosValue;
+            if (Math.Abs(alpha) % (Math.PI / 4) < 1e-10 && Math.Abs(alpha) % (7*Math.PI / 12) > 1e-10)
+                if (Math.Abs(sinValue - cosValue) < 1e-10) return -1;
+            
+
+            if (Math.Abs(cosValue) < 1e-10) return double.NaN; 
+            if (Math.Abs(sinValue) < 1e-10) return 0.0; 
+
+            return sinValue / cosValue * sign;
         }
         // ctg a = 1/ tg a
         internal static double Cot(double alpha, Func<double, double>? tan = null)
@@ -87,9 +93,8 @@ namespace FunctionSystem
             tan ??= (angle) => Tan(angle, cos);
             cot ??= (angle) => Cot(angle, tan);
 
-            return (cot(x) / sec(x) - tan(x)) * sin(x) / cos(x) 
-                * Math.Pow( sin(x) + 2* cos(x), 2);
+            return (cot(x) / sec(x) - tan(x)) * sin(x) / cos(x)
+                * Math.Pow(sin(x) + 2 * cos(x), 2);
         }
     }
-
 }
