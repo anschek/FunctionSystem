@@ -184,6 +184,7 @@ namespace FunctionSystem_Test
                 double expected = Complex.FunctionSystem(x[i], trigDriver, logDriver);
                 double real = Complex.FunctionSystem(x[i]);
                 Console.WriteLine($"real:{real}");
+                Assert.AreEqual(expected, real, epsilon);
             }
             
         }

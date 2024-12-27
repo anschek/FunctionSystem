@@ -19,11 +19,12 @@ namespace FunctionSystem
         // second function from task
         public static double SystemFunc(double x, Func<double,double>?ln=null, Func<double, double,double>? log = null)
         {
+
             if(x<=0) return double.NaN;
 
             ln ??= _base;
-            log ??= (b, arg) => Log(b, arg, ln);
-            return (Math.Pow(log(5, x), 3) * log(10, x) + log(3, x)) / ln(x)
+            log ??= (b, arg) => Log(b, arg, _base);                 
+            return (log(5, Math.Pow(x,3)) * log(10, x) + log(3, x)) / ln(x)
                 + ln(x) * log(5, x);
         }
     }
